@@ -1,63 +1,80 @@
 /*
-	Prologue by HTML5 UP
+	Big Picture by HTML5 UP
 	html5up.net | @n33co
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
 (function($) {
 
+	var settings = {
+
+		// Fullscreen?
+			fullScreen: true,
+			
+		// Section Transitions?
+			sectionTransitions: true,
+
+		// Fade in speed (in ms).
+			fadeInSpeed: 1000
+
+	};
+
 	skel.init({
 		reset: 'full',
 		breakpoints: {
-			'global':	{ range: '*', href: 'css/style.css', containers: 1400, grid: { gutters: 40 }, viewport: { scalable: false } },
-			'wide':		{ range: '961-1880', href: 'css/style-wide.css', containers: 1200, grid: { gutters: 40 } },
-			'normal':	{ range: '961-1620', href: 'css/style-normal.css', containers: 960, grid: { gutters: 40 } },
-			'narrow':	{ range: '961-1320', href: 'css/style-narrow.css', containers: '100%', grid: { gutters: 20 } },
-			'narrower':	{ range: '-960', href: 'css/style-narrower.css', containers: '100%', grid: { gutters: 15 } },
-			'mobile':	{ range: '-640', href: 'css/style-mobile.css', grid: { collapse: true } }
-		}
-	}, {
-		layers: {
-			layers: {
-				sidePanel: {
-					hidden: true,
-					breakpoints: 'narrower',
-					position: 'top-left',
-					side: 'left',
-					animation: 'pushX',
-					width: 240,
-					height: '100%',
-					clickToClose: true,
-					html: '<div data-action="moveElement" data-args="header"></div>',
-					orientation: 'vertical'
-				},
-				sidePanelToggle: {
-					breakpoints: 'narrower',
-					position: 'top-left',
-					side: 'top',
-					height: '4em',
-					width: '5em',
-					html: '<div data-action="toggleLayer" data-args="sidePanel" class="toggle"></div>'
-				}
-			}
+			'max': { range: '*', href: 'css/style.css', containers: 1440, viewport: { scalable: false }, grid: { gutters: 40 } },
+			'wide': { range: '-1920', href: 'css/style-wide.css', containers: 1360 },
+			'normal': { range: '-1680', href: 'css/style-normal.css', containers: 1200 },
+			'narrow': { range: '-1280', href: 'css/style-narrow.css', containers: 960 },
+			'narrower': { range: '-1000', href: 'css/style-narrower.css', containers: '95%' },
+			'mobile': { range: '-640', href: 'css/style-mobile.css', grid: { gutters: 20 } },
+			'mobile-narrow': { range: '-480', grid: { collapse: true, gutters: 10 } }
 		}
 	});
-
+	
 	$(function() {
 
 		var	$window = $(window),
-			$body = $('body');
+			$body = $('body'),
+			$header = $('#header'),
+			$all = $body.add($header),
+			sectionTransitionState = false;
+
+		// Settings.
+		
+			// IE<10?
+				if (skel.vars.IEVersion < 10) {
+					
+					// Turn off transitions.
+						settings.sectionTransitions = false;
+						
+				}
+		
+			// Touch?
+				if (skel.vars.isTouch) {
+				
+					// Disable section transitions
+						settings.sectionTransitions = false;
+						
+					// Turn on touch mode
+						$body.addClass('touch');
+				
+				}
+				
+		// Fade in once everything's loaded.
+			$all
+				.addClass('is-loading')
+				.fadeTo(0, 0.0001);
 			
-		// Disable animations/transitions until the page has loaded.
-			$body.addClass('is-loading');
-			
-			$window.on('load', function() {
-				$body.removeClass('is-loading');
+			$window.load(function() {
+				window.setTimeout(function() {
+					$all
+						.fadeTo(settings.fadeInSpeed, 1, function() {
+							$body.removeClass('is-loading');
+							$all.fadeTo(0, 1);
+						});
+				}, settings.fadeInSpeed);
 			});
-			
-		// CSS polyfills (IE<9).
-			if (skel.vars.IEVersion < 9)
-				$(':last-child').addClass('last-child');
 
 		// Forms (IE<10).
 			var $form = $('form');
@@ -74,53 +91,215 @@
 					$form.n33_formerize();
 				}
 
+				// Custom select.
+					$form.find('.select select')
+						.on('focus', function() {
+							$(this).parent().addClass('focus');
+						})
+						.on('blur', function() {
+							$(this).parent().removeClass('focus');
+						});						
+
 			}
 
-		// Scrolly links.
-			$('.scrolly').scrolly();
+		// CSS polyfills (IE<9).
+			if (skel.vars.IEVersion < 9)
+				$(':last-child').addClass('last-child');
 
-		// Nav.
-			var $nav_a = $('#nav a');
+		// Gallery.
+			$('.gallery').poptrox({
+				baseZIndex: 10001,
+				useBodyOverflow: false,
+				usePopupEasyClose: false,
+				overlayColor: '#1f2328',
+				overlayOpacity: 0.65,
+				usePopupDefaultStyling: false,
+				usePopupCaption: true,
+				popupLoaderText: '',
+				windowMargin: (skel.isActive('mobile') ? 5 : 50),
+				usePopupNav: true
+			});
+
+		// Section transitions.
+
+			if (settings.sectionTransitions) {
+
+				// Generic sections.
+					$('.main.style1')
+						.scrollwatch({
+							delay:		50,
+							range:		0.5,
+							anchor:		'center',
+							on:			function(t) { t.removeClass('inactive'); },
+							off:		function(t) { t.addClass('inactive'); }
+						});
+
+					$('.main.style2')
+						.scrollwatch({
+							delay:		50,
+							range:		0.5,
+							anchor:		'center',
+							init:		function(t) { t.addClass('inactive'); },
+							on:			function(t) { t.removeClass('inactive'); },
+							off:		function(t) { t.addClass('inactive'); }
+						});
 			
-			// Scrolly-fy links.
-				$nav_a
-					.scrolly()
-					.on('click', function(e) {
+				// Work.
+					$('#work')
+						.scrollwatch({
+							delay:		25,
+							range:		0.6,
+							anchor:		'center',
+							init:		function(t) { t.find('.row.images').addClass('inactive'); },
+							on:			function(t) {
+											var	rows = t.find('.row.images'),
+												length = rows.length,
+												n = 0;
+											
+											rows.each(function() {
+												var row = $(this);
+												window.setTimeout(function() {
+													row.removeClass('inactive');
+												}, 100 * (length - n++));
+											});
+										},
+							off:		function(t) {
+											var	rows = t.find('.row.images'),
+												length = rows.length,
+												n = 0;
+											
+											rows.each(function() {
+												var row = $(this);
+												window.setTimeout(function() {
+													row.addClass('inactive');
+												}, 100 * (length - n++));
+											});
+										}
+						});
 
-						var t = $(this),
-							href = t.attr('href');
-						
-						if (href[0] != '#')
-							return;
-						
-						e.preventDefault();
-						
-						// Clear active and lock scrollzer until scrolling has stopped
-							$nav_a
-								.removeClass('active')
-								.addClass('scrollzer-locked');
-					
-						// Set this link to active
-							t.addClass('active');
-					
-					});
+				// Contact.
+					$('#contact')
+						.scrollwatch({
+							delay:		25,
+							range:		0.5,
+							anchor:		'center',
+							init:		function(t) { t.addClass('inactive'); },
+							on:			function(t) { t.removeClass('inactive'); },
+							off:		function(t) { t.addClass('inactive'); }
+						});
 
-			// Initialize scrollzer.
-				var ids = [];
+			}
+
+		// Events.
+		
+			// Change (skel).
+				skel.change(function() {
+
+					// Force touch mode if we're in mobile.
+						if (skel.isActive('mobile'))
+							$body.addClass('touch');
+						else if (!skel.vars.isTouch)
+							$body.removeClass('touch');
 				
-				$nav_a.each(function() {
+					// Section transitions.
+						if (settings.sectionTransitions) {
+						
+							if (skel.isActive('mobile')) {
+
+								// Generic sections.
+									$('.main.style1')
+										.scrollwatchSuspend();
+									
+									$('.main.style2')
+										.scrollwatchSuspend();
+							
+								// Work.
+									$('#work')
+										.scrollwatchSuspend();
+
+								// Contact.
+									$('#contact')
+										.scrollwatchSuspend();
+							
+							}
+							else {
+
+								// Generic sections.
+									$('.main.style1')
+										.scrollwatchResume();
+									
+									$('.main.style2')
+										.scrollwatchResume();
+							
+								// Work.
+									$('#work')
+										.scrollwatchResume();
+
+								// Contact.
+									$('#contact')
+										.scrollwatchResume();
+
+							}
+
+						}
 					
-					var href = $(this).attr('href');
-					
-					if (href[0] != '#')
-						return;
+				});
+
+			// Resize.
+				var resizeTimeout, resizeScrollTimeout;
 				
-					ids.push(href.substring(1));
-				
+				$window.resize(function() {
+
+					// Disable animations/transitions.
+						$body.addClass('is-loading');
+
+					window.clearTimeout(resizeTimeout);
+
+					resizeTimeout = window.setTimeout(function() {
+
+						// Update scrolly links.
+							$('a[href^=#]').scrolly(1500, $header.outerHeight() - 1);
+
+						// Resize fullscreen elements.
+							if (settings.fullScreen
+							&&	!skel.isActive('mobile')) {
+								$('.fullscreen').each(function() {
+								
+									var $t = $(this),
+										$c = $t.children('.content'),
+										x = Math.max(100, Math.round(($window.height() - $c.outerHeight() - $header.outerHeight()) / 2) + 1);
+
+									$t
+										.css('padding-top', x)
+										.css('padding-bottom', x);
+								
+								});
+							}
+							else
+								$('.fullscreen')
+									.css('padding-top', '')
+									.css('padding-bottom', '');
+							
+							
+						// Re-enable animations/transitions.
+							window.setTimeout(function() {
+								$body.removeClass('is-loading');
+								$window.trigger('scroll');
+							}, 0);
+
+					}, 100);
+
 				});
 				
-				$.scrollzer(ids, { pad: 200, lastHack: true });
+		// Trigger events on load.
+			$window.load(function() {
+				
+				$window
+					.trigger('resize')
+					.trigger('scroll');
+			
+			});
 
 	});
-
+	
 })(jQuery);
