@@ -1,9 +1,8 @@
 <?php
 $name = $_POST['name'];
 $email = $_POST['email'];
-$type = $_POST['type'];
 $message = $_POST['message'];
-$formcontent=" From: $name \n Type: $type \n Message: $message";
+$formcontent=" From: $name  \n Message: $message";
 $recipient = "gregmoiras@gmail.com";
 $subject = "Contact Form";
 $mailheader = "From: $email \r\n";
