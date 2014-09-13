@@ -74,6 +74,11 @@
 		transition: all 0.2s ease-in-out, color 0.2s ease-in-out;
 	}
 
+	.dark a.link_lighthouse{
+		color: black;
+		text-decoration: none
+	}
+
 	sub {
 		position: relative;
 		top: 0.5em;
@@ -488,7 +493,7 @@
 			}
 
 	/* Main */
-		
+
 		.main {
 			position: relative;
 			margin: 0;
