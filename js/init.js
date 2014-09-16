@@ -4,7 +4,16 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
+
+
+
 (function($) {
+
+	$('body').on('click', '.poptrox-popup .caption #url_link',function(e){
+		e.preventDefault();
+		var url_link = $(this).attr('href');
+		window.location = url_link;
+	})
 
 	var settings = {
 
